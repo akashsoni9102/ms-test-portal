@@ -1,0 +1,33 @@
+# v0 runtime files (should only exist in preview, not in git)
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+instrumentation-client.js
+instrumentation-client.ts
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build output
+dist/
+dist-ssr/
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
