@@ -96,7 +96,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await api.delete(`/auth/students/${student.id}`);
+        await api.delete(`/auth/students/${student.id || student._id}`);
         toast.success('Student deleted');
         fetchStudents();
       } catch (error) {
@@ -427,17 +427,17 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {students.map((student) => (
-                    <tr key={student.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={student._id || student.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">{student.name}</td>
                       <td className="py-3 px-4 text-gray-700">{student.email}</td>
-                      <td className="py-3 px-4 text-gray-700">{student.mobile}</td>
+                      <td className="py-3 px-4 text-gray-700">{student.mobile ?? '-'}</td>
                       <td className="py-3 px-4 text-gray-600 text-sm">{new Date(student.createdAt).toLocaleDateString()}</td>
                       <td className="py-3 px-4">
                         <button
                           onClick={() => handleDeleteStudent(student)}
                           className="p-2 hover:bg-red-100 rounded text-red-600 hover:text-red-700 transition-colors"
                           title="Delete student"
-                          data-testid={`delete-student-${student.id}`}
+                          data-testid={`delete-student-${student._id || student.id}`}
                         >
                           <Trash2 size={16} />
                         </button>
