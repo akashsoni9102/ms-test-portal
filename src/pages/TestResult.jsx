@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, AlertCircle, Clock, Award, Bookmark } from 'lucide-react';
-import api from '../utils/api';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Clock,
+  Award,
+  Bookmark,
+} from "lucide-react";
+import api from "../utils/api";
+import { toast } from "sonner";
 
 const TestResult = () => {
   const { attemptId } = useParams();
@@ -17,20 +25,20 @@ const TestResult = () => {
 
   const fetchData = async () => {
     try {
-      const attemptsRes = await api.get('/attempts/my-attempts');
+      const attemptsRes = await api.get("/attempts/my-attempts");
       const foundAttempt = attemptsRes.data.find((a) => a.id === attemptId);
       if (!foundAttempt) {
-        toast.error('Attempt not found');
-        navigate('/student');
+        toast.error("Attempt not found");
+        navigate("/student");
         return;
       }
       setAttempt(foundAttempt);
 
-      const revisionsRes = await api.get('/revisions');
+      const revisionsRes = await api.get("/revisions");
       setRevisions(revisionsRes.data.map((r) => r.questionId));
     } catch (error) {
-      toast.error('Failed to load result');
-      navigate('/student');
+      toast.error("Failed to load result");
+      navigate("/student");
     } finally {
       setLoading(false);
     }
@@ -39,19 +47,21 @@ const TestResult = () => {
   const handleMarkForRevision = async (questionId) => {
     try {
       if (revisions.includes(questionId)) {
-        await api.delete(`/revisions?test_id=${attempt.testId}&question_id=${questionId}`);
+        await api.delete(
+          `/revisions?test_id=${attempt.testId}&question_id=${questionId}`,
+        );
         setRevisions(revisions.filter((id) => id !== questionId));
-        toast.success('Removed from revision');
+        toast.success("Removed from revision");
       } else {
-        await api.post('/revisions', {
+        await api.post("/revisions", {
           testId: attempt.testId,
           questionId: questionId,
         });
         setRevisions([...revisions, questionId]);
-        toast.success('Marked for revision');
+        toast.success("Marked for revision");
       }
     } catch (error) {
-      toast.error('Failed to update revision');
+      toast.error("Failed to update revision");
     }
   };
 
@@ -66,13 +76,18 @@ const TestResult = () => {
     );
   }
 
-  const totalQuestions = attempt.correctCount + attempt.incorrectCount + attempt.unattemptedCount;
-  const accuracy = totalQuestions > 0 ? ((attempt.correctCount / totalQuestions) * 100).toFixed(1) : 0;
-  
+  const totalQuestions =
+    attempt.correctCount + attempt.incorrectCount + attempt.unattemptedCount;
+  const accuracy =
+    totalQuestions > 0
+      ? ((attempt.correctCount / totalQuestions) * 100).toFixed(1)
+      : 0;
+
   const weakSections = {};
   attempt.detailedResults.forEach((result) => {
     if (!result.isCorrect) {
-      const category = result.status === 'unattempted' ? 'Unattempted' : 'Incorrect';
+      const category =
+        result.status === "unattempted" ? "Unattempted" : "Incorrect";
       weakSections[category] = (weakSections[category] || 0) + 1;
     }
   });
@@ -83,17 +98,22 @@ const TestResult = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
-              onClick={() => navigate('/student')}
+              onClick={() => navigate("/student")}
               data-testid="back-button"
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
             >
               <ArrowLeft size={20} className="text-gray-600" />
             </button>
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate" style={{ fontFamily: 'Manrope, sans-serif' }}>
+              <h1
+                className="text-lg sm:text-xl font-bold text-gray-900 truncate"
+                style={{ fontFamily: "Manrope, sans-serif" }}
+              >
                 Test Results
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 truncate">{attempt.testTitle}</p>
+              <p className="text-xs sm:text-sm text-gray-600 truncate">
+                {attempt.testTitle}
+              </p>
             </div>
           </div>
           {attempt.isFirstAttempt && (
@@ -113,7 +133,11 @@ const TestResult = () => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs sm:text-sm text-gray-600">Total Marks</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Manrope, sans-serif' }} data-testid="total-marks">
+                <p
+                  className="text-2xl sm:text-3xl font-bold text-gray-900"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                  data-testid="total-marks"
+                >
                   {attempt.marks}
                 </p>
               </div>
@@ -127,8 +151,12 @@ const TestResult = () => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs sm:text-sm text-gray-600">Time Taken</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mono" data-testid="time-taken">
-                  {Math.floor(attempt.timeTaken / 60)}:{(attempt.timeTaken % 60).toString().padStart(2, '0')}
+                <p
+                  className="text-2xl sm:text-3xl font-bold text-gray-900 mono"
+                  data-testid="time-taken"
+                >
+                  {Math.floor(attempt.timeTaken / 60)}:
+                  {(attempt.timeTaken % 60).toString().padStart(2, "0")}
                 </p>
               </div>
             </div>
@@ -137,11 +165,18 @@ const TestResult = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
-                <CheckCircle size={20} className="sm:w-6 sm:h-6 text-purple-600" />
+                <CheckCircle
+                  size={20}
+                  className="sm:w-6 sm:h-6 text-purple-600"
+                />
               </div>
               <div className="min-w-0">
                 <p className="text-xs sm:text-sm text-gray-600">Accuracy</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Manrope, sans-serif' }} data-testid="accuracy">
+                <p
+                  className="text-2xl sm:text-3xl font-bold text-gray-900"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                  data-testid="accuracy"
+                >
                   {accuracy}%
                 </p>
               </div>
@@ -151,15 +186,30 @@ const TestResult = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <div className="grid grid-cols-3 gap-1 sm:gap-2 text-center">
               <div>
-                <p className="text-lg sm:text-2xl font-bold text-green-700" data-testid="correct-count">{attempt.correctCount}</p>
+                <p
+                  className="text-lg sm:text-2xl font-bold text-green-700"
+                  data-testid="correct-count"
+                >
+                  {attempt.correctCount}
+                </p>
                 <p className="text-xs text-gray-600">Correct</p>
               </div>
               <div>
-                <p className="text-lg sm:text-2xl font-bold text-red-700" data-testid="incorrect-count">{attempt.incorrectCount}</p>
+                <p
+                  className="text-lg sm:text-2xl font-bold text-red-700"
+                  data-testid="incorrect-count"
+                >
+                  {attempt.incorrectCount}
+                </p>
                 <p className="text-xs text-gray-600">Wrong</p>
               </div>
               <div>
-                <p className="text-lg sm:text-2xl font-bold text-gray-600" data-testid="unattempted-count">{attempt.unattemptedCount}</p>
+                <p
+                  className="text-lg sm:text-2xl font-bold text-gray-600"
+                  data-testid="unattempted-count"
+                >
+                  {attempt.unattemptedCount}
+                </p>
                 <p className="text-xs text-gray-600">Skipped</p>
               </div>
             </div>
@@ -167,27 +217,42 @@ const TestResult = () => {
         </div>
 
         {Object.keys(weakSections).length > 0 && (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8" data-testid="weak-sections-alert">
-            <h3 className="text-base sm:text-lg font-bold text-orange-900 mb-3 sm:mb-4 flex items-center gap-2" style={{ fontFamily: 'Manrope, sans-serif' }}>
+          <div
+            className="bg-orange-50 border border-orange-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8"
+            data-testid="weak-sections-alert"
+          >
+            <h3
+              className="text-base sm:text-lg font-bold text-orange-900 mb-3 sm:mb-4 flex items-center gap-2"
+              style={{ fontFamily: "Manrope, sans-serif" }}
+            >
               <AlertCircle size={20} className="sm:w-6 sm:h-6 flex-shrink-0" />
               <span>Weak Sections Analysis</span>
             </h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
               {Object.entries(weakSections).map(([category, count]) => (
-                <div key={category} className="bg-white rounded-lg p-3 sm:p-4 text-center">
-                  <p className="text-lg sm:text-2xl font-bold text-orange-700">{count}</p>
+                <div
+                  key={category}
+                  className="bg-white rounded-lg p-3 sm:p-4 text-center"
+                >
+                  <p className="text-lg sm:text-2xl font-bold text-orange-700">
+                    {count}
+                  </p>
                   <p className="text-xs sm:text-sm text-gray-700">{category}</p>
                 </div>
               ))}
             </div>
             <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-orange-800">
-              Review these questions and mark them for revision to improve your performance.
+              Review these questions and mark them for revision to improve your
+              performance.
             </p>
           </div>
         )}
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-          <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-4 sm:mb-6" style={{ fontFamily: 'Manrope, sans-serif' }}>
+          <h3
+            className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-4 sm:mb-6"
+            style={{ fontFamily: "Manrope, sans-serif" }}
+          >
             Answer Review
           </h3>
 
@@ -198,10 +263,10 @@ const TestResult = () => {
                 data-testid={`question-result-${index}`}
                 className={`p-4 sm:p-6 rounded-lg border-2 ${
                   result.isCorrect
-                    ? 'border-green-200 bg-green-50'
-                    : result.status === 'unattempted'
-                    ? 'border-gray-200 bg-gray-50'
-                    : 'border-red-200 bg-red-50'
+                    ? "border-green-200 bg-green-50"
+                    : result.status === "unattempted"
+                      ? "border-gray-200 bg-gray-50"
+                      : "border-red-200 bg-red-50"
                 }`}
               >
                 <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -209,38 +274,59 @@ const TestResult = () => {
                     <div
                       className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
                         result.isCorrect
-                          ? 'bg-green-100'
-                          : result.status === 'unattempted'
-                          ? 'bg-gray-100'
-                          : 'bg-red-100'
+                          ? "bg-green-100"
+                          : result.status === "unattempted"
+                            ? "bg-gray-100"
+                            : "bg-red-100"
                       }`}
                     >
                       {result.isCorrect ? (
-                        <CheckCircle size={18} className="sm:w-6 sm:h-6 text-green-600" />
-                      ) : result.status === 'unattempted' ? (
-                        <AlertCircle size={18} className="sm:w-6 sm:h-6 text-gray-600" />
+                        <CheckCircle
+                          size={18}
+                          className="sm:w-6 sm:h-6 text-green-600"
+                        />
+                      ) : result.status === "unattempted" ? (
+                        <AlertCircle
+                          size={18}
+                          className="sm:w-6 sm:h-6 text-gray-600"
+                        />
                       ) : (
-                        <XCircle size={18} className="sm:w-6 sm:h-6 text-red-600" />
+                        <XCircle
+                          size={18}
+                          className="sm:w-6 sm:h-6 text-red-600"
+                        />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold text-sm sm:text-base text-gray-900 mb-1 sm:mb-2">
-                        Question {index + 1}: <span className="break-words">{result.questionText}</span>
+                        Question {index + 1}:{" "}
+                        <span className="break-words whitespace-pre-wrap">
+                          {result.questionText}
+                        </span>
                       </h4>
-                      {result.status === 'unattempted' ? (
-                        <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Not attempted</p>
+                      {result.status === "unattempted" ? (
+                        <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                          Not attempted
+                        </p>
                       ) : (
                         <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
-                          Your answer: <span className="font-medium">Option {result.selectedOption + 1}</span>
+                          Your answer:{" "}
+                          <span className="font-medium">
+                            Option {result.selectedOption + 1}
+                          </span>
                         </p>
                       )}
                       <p className="text-xs sm:text-sm text-green-700 font-medium">
-                        Correct answer: <span className="font-semibold">Option {result.correctOption + 1}</span>
+                        Correct answer:{" "}
+                        <span className="font-semibold">
+                          Option {result.correctOption + 1}
+                        </span>
                       </p>
                       {result.explanation && (
                         <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-white rounded-lg border border-gray-200">
-                          <p className="text-xs sm:text-sm text-gray-700">
-                            <span className="font-semibold">Explanation:</span> {result.explanation}
+                          <p className="text-xs sm:text-sm text-gray-700 whitespace-pre-wrap">
+                            <span className="font-semibold">Explanation:</span>{" "}
+                            {result.explanation}
                           </p>
                         </div>
                       )}
@@ -251,10 +337,14 @@ const TestResult = () => {
                     data-testid={`mark-revision-button-${index}`}
                     className={`ml-0 sm:ml-2 p-2 rounded-lg transition-all flex-shrink-0 ${
                       revisions.includes(result.questionId)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
+                        ? "bg-blue-600 text-white"
+                        : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-50"
                     }`}
-                    title={revisions.includes(result.questionId) ? 'Remove from revision' : 'Mark for revision'}
+                    title={
+                      revisions.includes(result.questionId)
+                        ? "Remove from revision"
+                        : "Mark for revision"
+                    }
                   >
                     <Bookmark size={18} className="sm:w-5 sm:h-5" />
                   </button>
@@ -266,14 +356,14 @@ const TestResult = () => {
 
         <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
           <button
-            onClick={() => navigate('/student')}
+            onClick={() => navigate("/student")}
             data-testid="back-to-dashboard-button"
             className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm sm:text-base"
           >
             Back to Dashboard
           </button>
           <button
-            onClick={() => navigate('/revision')}
+            onClick={() => navigate("/revision")}
             data-testid="view-revision-button"
             className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all active:scale-95 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
           >
